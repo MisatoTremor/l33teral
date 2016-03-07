@@ -56,12 +56,34 @@ describe('L33teral', function () {
       done();
     });
 
+    it('should throw if an intermediate part of the graph is null and no default value is provided', function (done) {
+      var mock = mockObject();
+      var leetMock = leet(mock);
+
+      assert.throw(function () {
+        leetMock.tap('nullObject.missing');
+      }, Error);
+
+      done();
+    });
+
     it('should return the default value if no graph is present and the default value is provided', function (done) {
       var mock = mockObject();
       var leetMock = leet(mock);
 
       var expected = '646';
       var actual = leetMock.tap('phoneNumber.1.areaCode', expected);
+      assert.equal(actual, expected);
+
+      done();
+    });
+
+    it('should return the default value if an intermediate part of the graph is null and the default value is provided', function (done) {
+      var mock = mockObject();
+      var leetMock = leet(mock);
+
+      var expected = '646';
+      var actual = leetMock.tap('nullObject.missing', expected);
       assert.equal(actual, expected);
 
       done();
@@ -127,6 +149,9 @@ describe('L33teral', function () {
       assert.isFalse(actual);
 
       actual = leetMock.probe('phoneNumber.2');
+      assert.isFalse(actual);
+
+      actual = leetMock.probe('nullObject.missing');
       assert.isFalse(actual);
 
       done();
@@ -406,6 +431,15 @@ describe('L33teral', function () {
       mockLeet.plant('foo.bar.baz.bin', expected);
       assert.deepProperty(mock, 'foo.bar.baz.bin');
       assert.deepPropertyVal(mock, 'foo.bar.baz.bin', expected);
+    });
+
+    it('creates the remainder of an existing graph if a intermediate part is null with a predetermined value', function (done) {
+      var mock = mockObject();
+      var mockLeet = leet(mock);
+      var expected = [1, 2, 3, 4];
+      mockLeet.plant('nullObject.bar.baz.bin', expected);
+      assert.deepProperty(mock, 'nullObject.bar.baz.bin');
+      assert.deepPropertyVal(mock, 'nullObject.bar.baz.bin', expected);
       done();
     });
 
@@ -463,8 +497,26 @@ describe('L33teral', function () {
       done();
     });
 
+    it('throws a graph error if intermediate part of the path does exist but is null', function (done) {
+      var mock = {foo: {bar: null}};
+      var mockLeet = leet(mock);
+
+      assert.throw(function () {
+        mockLeet.snip('foo.bar.baz');
+      }, Error);
+
+      done();
+    });
+
     it('exits silently if instructed to suppress errors and part of the path does not exist', function (done) {
       var mock = {foo: {bar: {baz: 'bin'}}};
+      var mockLeet = leet(mock);
+      mockLeet.snip('foo.buz.baz', true);
+      done();
+    });
+
+    it('exits silently if instructed to suppress errors and intermediate part of the path does exist but is null', function (done) {
+      var mock = {foo: {bar: null}};
       var mockLeet = leet(mock);
       mockLeet.snip('foo.buz.baz', true);
       done();
@@ -505,6 +557,20 @@ describe('L33teral', function () {
       done();
     });
 
+    it('throws a graph error if part of the path does exist but is null', function (done) {
+      var mock = {foo: {bar: {baz: null } } };
+      var mockLeet = leet(mock);
+
+      assert.throw(function () {
+        mockLeet.purge('foo.buz.baz');
+      }, Error);
+
+      assert.property(mock, 'foo');
+      assert.property(mock.foo, 'bar');
+      assert.property(mock.foo.bar, 'baz');
+      done();
+    });
+
     it('exits silently if instructed to suppress errors and part of the path does not exist', function (done) {
       var mock = {foo: {bar: {baz: {bin: {} } } } };
       var mockLeet = leet(mock);
@@ -513,6 +579,16 @@ describe('L33teral', function () {
       assert.property(mock.foo, 'bar');
       assert.property(mock.foo.bar, 'baz');
       assert.property(mock.foo.bar.baz, 'bin');
+      done();
+    });
+
+    it('exits silently if instructed to suppress errors and part of the path does exist but is null', function (done) {
+      var mock = {foo: {bar: {baz: null } } };
+      var mockLeet = leet(mock);
+      mockLeet.purge('foo.buz.baz', true);
+      assert.property(mock, 'foo');
+      assert.property(mock.foo, 'bar');
+      assert.property(mock.foo.bar, 'baz');
       done();
     });
   });

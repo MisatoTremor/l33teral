@@ -20,7 +20,8 @@ var obj = {
       "type": "fax",
       "number": "646 555-4567"
     }
-  ]
+  ],
+  "nullObject": null
 };
 
 module.exports = function () {

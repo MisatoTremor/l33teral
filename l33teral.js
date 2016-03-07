@@ -82,7 +82,7 @@
       useDefault = (arguments.length === 2);
 
     while (++index <= lastIndex) {
-      if (value.hasOwnProperty(properties[index])) {
+      if (null !== value && value.hasOwnProperty(properties[index])) {
         value = value[properties[index]];
         continue;
       }
@@ -116,7 +116,7 @@
       lastIndex = properties.length - 1;
 
     while (++index <= lastIndex) {
-      if (!value.hasOwnProperty(properties[index])) {
+      if (null === value || !value.hasOwnProperty(properties[index])) {
         return false;
       }
       value = value[properties[index]];
@@ -322,7 +322,7 @@
 
     while (isMore()) {
       segment = segments[position];
-      if (!current.hasOwnProperty(segment)) {
+      if (!current.hasOwnProperty(segment) || null === current[segment]) {
         current[segment] = {};
       }
       if (isLast()) {
@@ -361,7 +361,7 @@
 
     while (isMore()) {
       segment = segments[position];
-      if (!current.hasOwnProperty(segment)) {
+      if (null === current || !current.hasOwnProperty(segment)) {
         if (suppressError) {
           return;
         }
@@ -409,7 +409,7 @@
 
     while (isMore()) {
       segment = segments[position];
-      if (!current.hasOwnProperty(segment)) {
+      if (null === current || !current.hasOwnProperty(segment)) {
         if (suppressError) {
           return;
         }
